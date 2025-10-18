@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { list } from "@vercel/blob";
+import { list, type ListBlobResultBlob } from "@vercel/blob";
 
 type GalleryPageProps = {
   params: Promise<{
@@ -23,7 +23,7 @@ export async function generateStaticParams() {
 export const revalidate = 3600;
 
 // Fisher-Yates shuffle function.
-function shuffleArray( array: any[] ) {
+function shuffleArray<T>( array: T[] ): T[] {
   let currentIndex = array.length, randomIndex;
 
   // While there remain elements to shuffle.
@@ -51,7 +51,9 @@ export default async function GalleryPage( props: GalleryPageProps ) {
     prefix: `${ slug }/`,
   } );
 
-  const imageBlobs = blobs.filter( blob => blob.pathname.toLowerCase().endsWith( ".webp" ) );
+  const imageBlobs: ListBlobResultBlob[] = blobs.filter( blob =>
+    blob.pathname.toLowerCase().endsWith( ".webp" )
+  );
 
   const shuffledImageBlobs = shuffleArray( imageBlobs );
 
