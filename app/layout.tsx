@@ -18,9 +18,11 @@ export default function RootLayout( {
   children: React.ReactNode;
 }> ) {
   return (
-    <html lang="en">
-    <body className={ poppins.className }>
-    { children }
+    <html lang="en" className="h-full">
+    <body className={ `${ poppins.className } flex flex-col h-full` }>
+    <main className="flex-grow">
+      { children }
+    </main>
     <footer className="text-center py-20 text-gray-500 text-sm">
       <p>&copy; { new Date().getFullYear() } argentique by Maxime Bodin. All rights reserved.</p>
     </footer>
