@@ -23,13 +23,13 @@ export async function generateStaticParams() {
 export const revalidate = 3600;
 
 // Fisher-Yates shuffle function.
-function shuffleArray(array: any[]) {
+function shuffleArray( array: any[] ) {
   let currentIndex = array.length, randomIndex;
 
   // While there remain elements to shuffle.
   while (currentIndex !== 0) {
     // Pick a remaining element.
-    randomIndex = Math.floor(Math.random() * currentIndex);
+    randomIndex = Math.floor( Math.random() * currentIndex );
     currentIndex--;
 
     // And swap it with the current element.
@@ -40,7 +40,7 @@ function shuffleArray(array: any[]) {
   return array;
 }
 
-export default async function GalleryPage(props: GalleryPageProps) {
+export default async function GalleryPage( props: GalleryPageProps ) {
   const params = await props.params;
 
   const {
@@ -53,12 +53,11 @@ export default async function GalleryPage(props: GalleryPageProps) {
 
   const imageBlobs = blobs.filter( blob => blob.pathname.toLowerCase().endsWith( ".webp" ) );
 
-  const shuffledImageBlobs = shuffleArray(imageBlobs);
+  const shuffledImageBlobs = shuffleArray( imageBlobs );
 
   return (
     <main className="container mx-auto px-2 py-10">
       <div className="flex justify-between items-center mb-10 px-2">
-
         <h1 className="group font-bold">
           <Link
             href="/"
@@ -74,7 +73,7 @@ export default async function GalleryPage(props: GalleryPageProps) {
         {/* Spacer */ }
       </div>
 
-      <div className="columns-1 sm:columns-2 lg:columns-3 gap-4">
+      <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 mt-20">
         { shuffledImageBlobs.map( ( image ) => (
           <div key={ image.pathname } className="mb-4 break-inside-avoid">
             <Image
