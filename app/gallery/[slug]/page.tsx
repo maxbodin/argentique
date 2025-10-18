@@ -3,9 +3,9 @@ import Link from "next/link";
 import { list } from "@vercel/blob";
 
 type GalleryPageProps = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
 export async function generateStaticParams() {
@@ -40,7 +40,13 @@ function shuffleArray(array: any[]) {
   return array;
 }
 
-export default async function GalleryPage( { params: { slug } }: GalleryPageProps ) {
+export default async function GalleryPage(props: GalleryPageProps) {
+  const params = await props.params;
+
+  const {
+    slug
+  } = params;
+
   const { blobs } = await list( {
     prefix: `${ slug }/`,
   } );
