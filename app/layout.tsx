@@ -24,7 +24,8 @@ export default function RootLayout( {
       { children }
     </main>
     <footer className="text-center py-20 text-gray-500 text-sm">
-      <p>&copy; { new Date().getFullYear() } argentique by Maxime Bodin. All rights reserved.</p>
+      <p>&copy; { new Date().getFullYear() } argentique by Maxime Bodin.
+        <br/> All rights reserved.</p>
     </footer>
     </body>
     </html>
