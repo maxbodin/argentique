@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { list, type ListBlobResultBlob } from "@vercel/blob";
+import { getGalleryFolders, getGalleryImages } from "@/app/lib/data";
 
 type GalleryPageProps = {
   params: Promise<{
@@ -9,13 +9,9 @@ type GalleryPageProps = {
 };
 
 export async function generateStaticParams() {
-  const { blobs } = await list();
-  const galleryFolders = new Set(
-    blobs.filter( blob => blob.pathname.includes( "/" ) )
-      .map( blob => blob.pathname.split( "/" )[0] )
-  );
+  const galleryFolders = await getGalleryFolders();
 
-  return Array.from( galleryFolders ).map( ( slug ) => ( {
+  return galleryFolders.map( ( slug ) => ( {
     slug,
   } ) );
 }
@@ -47,13 +43,7 @@ export default async function GalleryPage( props: GalleryPageProps ) {
     slug
   } = params;
 
-  const { blobs } = await list( {
-    prefix: `${ slug }/`,
-  } );
-
-  const imageBlobs: ListBlobResultBlob[] = blobs.filter( blob =>
-    blob.pathname.toLowerCase().endsWith( ".webp" )
-  );
+  const imageBlobs = await getGalleryImages( slug );
 
   const shuffledImageBlobs = shuffleArray( imageBlobs );
 
@@ -76,7 +66,7 @@ export default async function GalleryPage( props: GalleryPageProps ) {
       </div>
 
       <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 mt-20">
-        { shuffledImageBlobs.map( ( image ) => (
+        { shuffledImageBlobs.map( ( image, index ) => (
           <div key={ image.pathname } className="mb-4 break-inside-avoid">
             <Image
               src={ image.url }
@@ -84,7 +74,7 @@ export default async function GalleryPage( props: GalleryPageProps ) {
               width={ 500 }
               height={ 750 }
               className="w-full h-auto"
-              priority={ false }
+              priority={ index < 4 }
             />
           </div>
         ) ) }
