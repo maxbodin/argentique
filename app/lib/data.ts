@@ -17,20 +17,47 @@ const getAllBlobs = unstable_cache(
 );
 
 /**
- * Gets the list of unique gallery folder names from the cached blob data.
+ * Gets unique gallery folder names sorted from most recent to oldest.
  */
 export async function getGalleryFolders(): Promise<string[]> {
-  const allBlobs = await getAllBlobs();
+  const blobs = await getAllBlobs();
 
-  // Filter out blobs that are just folders (ending with '/') or don't have a path separator.
-  const imageBlobs = allBlobs.filter( blob => blob.pathname.includes( "/" ) );
+  const folders = new Set<string>();
 
-  const galleryFolders = new Set(
-    imageBlobs.map( ( blob ) => blob.pathname.split( "/" )[0] )
-  );
+  for (const { pathname } of blobs) {
+    if (!pathname.endsWith( "/" )) continue;
 
-  return Array.from( galleryFolders );
+    const folderName = pathname.split( "/", 1 )[0];
+
+    folders.add( folderName );
+  }
+
+  return [...folders].sort( compareFoldersByDateDesc );
 }
+
+/**
+ * Compares folder names using their YYYY MM prefix.
+ * Sorts by year DESC, then month DESC.
+ */
+function compareFoldersByDateDesc( a: string, b: string ): number {
+  const dateA = extractYearMonth( a );
+  const dateB = extractYearMonth( b );
+
+  return dateB.year - dateA.year || dateB.month - dateA.month;
+}
+
+/**
+ * Extracts year and month from folder name.
+ */
+function extractYearMonth( folder: string ): { year: number; month: number } {
+  const [year, month] = folder.split( "-", 2 );
+
+  return {
+    year: Number( year ),
+    month: Number( month ),
+  };
+}
+
 
 /**
  * Gets the image blobs for a specific gallery slug from the cached blob data.
