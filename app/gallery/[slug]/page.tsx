@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { getGalleryFolders, getGalleryImages } from "@/app/lib/data";
+import ImageWithFallback from "@/app/components/image-with-fallback";
 
 type GalleryPageProps = {
   params: Promise<{
@@ -68,13 +68,13 @@ export default async function GalleryPage( props: GalleryPageProps ) {
       <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 mt-20">
         { shuffledImageBlobs.map( ( image, index ) => (
           <div key={ image.pathname } className="mb-4 break-inside-avoid">
-            <Image
+            <ImageWithFallback
               src={ image.url }
               alt={ `Film photograph from the ${ slug } gallery by Maxime Bodin` }
               width={ 500 }
               height={ 750 }
               className="w-full h-auto"
-              priority={ index < 4 }
+              preload={ index < 4 }
             />
           </div>
         ) ) }
