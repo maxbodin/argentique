@@ -38,7 +38,7 @@ const leadSrcSet = photos.length > 0 ? await photoSrcSet( photos[0] ) : undefine
 
     <div class="columns-1 sm:columns-2 lg:columns-3 gap-4 mt-20">
       { photos.map( ( photo, index ) => (
-        <div class="mb-4 break-inside-avoid">
+        <div class="pb-4 break-inside-avoid">
           <GalleryPhoto
             photo={ photo }
             alt={ `Film photograph from the ${ slug } gallery by Maxime Bodin` }
