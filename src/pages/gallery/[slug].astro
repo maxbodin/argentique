@@ -1,0 +1,51 @@
+---
+import GalleryPhoto from "@/components/GalleryPhoto.astro";
+import Layout from "@/layouts/Layout.astro";
+import { getGalleryPhotos } from "@/lib/data";
+import { arrangePhotos, GALLERY_SIZES, photoSrcSet } from "@/lib/photos";
+
+const slug = Astro.params.slug ?? "";
+const photos = arrangePhotos( await getGalleryPhotos( slug ) );
+const leadSrcSet = photos.length > 0 ? await photoSrcSet( photos[0] ) : undefined;
+---
+<Layout>
+  { leadSrcSet && (
+    <link
+      slot="head"
+      rel="preload"
+      as="image"
+      fetchpriority="high"
+      imagesrcset={ leadSrcSet }
+      imagesizes={ GALLERY_SIZES }
+    />
+  ) }
+  <main class="container mx-auto px-2 py-10">
+    <div class="flex justify-between items-center mb-10 px-2">
+      <h1 class="group font-bold">
+        <a
+          href="/"
+          class="text-(--foreground) transition-colors duration-300 group-hover:text-(--hover-foreground)"
+        >
+          &larr; Back to Galleries
+        </a>
+      </h1>
+      <h2 class="text-3xl md:text-4xl tracking-widest uppercase text-center">
+        { slug.replace( /-/g, " " ) }
+      </h2>
+      <div class="w-40 hidden sm:block"></div>
+      <!-- Spacer -->
+    </div>
+
+    <div class="columns-1 sm:columns-2 lg:columns-3 gap-4 mt-20">
+      { photos.map( ( photo, index ) => (
+        <div class="mb-4 break-inside-avoid">
+          <GalleryPhoto
+            photo={ photo }
+            alt={ `Film photograph from the ${ slug } gallery by Maxime Bodin` }
+            priority={ index === 0 }
+          />
+        </div>
+      ) ) }
+    </div>
+  </main>
+</Layout>

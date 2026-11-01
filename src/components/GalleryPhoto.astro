@@ -1,0 +1,31 @@
+---
+import { GALLERY_SIZES, photoSrcSet } from "@/lib/photos";
+import type { Photo } from "@/types/photo";
+
+interface Props {
+  photo: Photo;
+  alt: string;
+  /** The first photo is the LCP element: fetch it eagerly with high priority. */
+  priority?: boolean;
+}
+
+const { photo, alt, priority = false } = Astro.props;
+const srcset = await photoSrcSet( photo );
+
+// Free-plan fallback: once Vercel's Image Optimization limits are reached, new resized copies fail (402). Dropping srcset makes the browser load the original (`src`) instead.
+const fallbackToOriginal = "this.onerror=null;this.removeAttribute('srcset')";
+---
+<img
+  src={ photo.src }
+  srcset={ srcset }
+  sizes={ GALLERY_SIZES }
+  width={ photo.width }
+  height={ photo.height }
+  alt={ alt }
+  loading={ priority ? "eager" : "lazy" }
+  fetchpriority={ priority ? "high" : "auto" }
+  decoding={ priority ? "auto" : "async" }
+  onerror={ fallbackToOriginal }
+  class="w-full h-auto bg-white bg-cover"
+  style={ photo.placeholder ? `background-image:url(${ photo.placeholder })` : undefined }
+/>

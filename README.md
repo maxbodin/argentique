@@ -1,57 +1,35 @@
 # Argentique
 
-Argentique is a film photography portfolio built with Next.js App Router and powered by Vercel Blob storage.
+Film photography portfolio built with [Astro](https://astro.build), Vercel Blob and Vercel. Galleries are read from Blob folder names and served as zero-JavaScript pages.
 
-The application automatically discovers galleries from blob folder names, statically renders gallery routes, and serves optimized image delivery with resilient fallback behavior.
+## Features
 
-## Contents
+- One gallery per Blob folder (`YYYY-MM-name/`), sorted newest first, at `/gallery/[slug]`.
+- Pages cached at the edge and regenerated hourly (ISR): new uploads appear without a redeploy, and the photo order reshuffles.
+- No client-side JavaScript; CSS and the font are inlined or preloaded.
+- Photos (`src/components/GalleryPhoto.astro`):
+	- Resized WebP q95 copies (384–828px) from Vercel Image Optimization; the original for full-resolution screens, or if optimization fails (free-plan limits).
+	- Real dimensions (no layout shift) and a tiny inline placeholder.
+	- First photo preloaded at high priority, the rest lazy-loaded. The first two are drawn from the lightest third so phones fill the first screen faster.
 
-- [Core Features](#core-features)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
+## How it works
 
-## Core Features
-
-- Dynamic gallery index generated from Vercel Blob folder paths.
-- Per-gallery route at `/gallery/[slug]`.
-- Incremental static regeneration (ISR) for both index and gallery pages.
-- Custom image component with:
-	- automatic optimization bypass for `.webp`, `.gif`, and `.svg`.
-	- graceful fallback to raw source URL if optimization fails.
-
-## Architecture
-
-### Request/Data Flow
-
-1. Server code calls `list()` from `@vercel/blob`.
-2. Blob listing is wrapped in `unstable_cache` (1-hour revalidation).
-3. Gallery folder names are extracted and sorted by year/month prefix.
-4. Home page links to each gallery slug.
-5. Gallery page filters images by slug prefix and `.webp` extension.
-6. UI renders through Next.js App Router with ISR.
-
-### Route Contract
-
-- `/`
-	- Lists available galleries from blob folders.
-	- Revalidates every 3600 seconds.
-- `/gallery/[slug]`
-	- Pre-generates static params from discovered gallery folders.
-	- Revalidates every 3600 seconds.
-	- Randomizes display order per regeneration cycle.
+1. The Blob listing is cached for 1 hour in the Vercel Runtime Cache.
+2. Each photo's size, placeholder and weight are cached per file version (keyed by ETag).
+3. Pages never wait on originals: uncached photos are sized from their WebP header, the rest is computed in the background for the next render.
 
 ## Project Structure
 
 ```text
-app/
-	components/
-		image-with-fallback.tsx   # Next.js Image wrapper with optimization/fallback logic
-	gallery/
-		[slug]/
-			page.tsx                # Gallery page and static params generation
-	lib/
-		data.ts                   # Blob listing, caching, folder/image selection
-	globals.css                 # Tailwind + global variables
-	layout.tsx                  # App shell + metadata + footer
-	page.tsx                    # Gallery index page
+src/
+	components/GalleryPhoto.astro   # Photo markup
+	layouts/Layout.astro            # Page shell, font, footer
+	lib/data.ts                     # Blob listing, caching, photo metadata
+	lib/image-config.ts             # Image quality and widths
+	lib/photos.ts                   # srcset and photo order
+	pages/index.astro               # Gallery list
+	pages/gallery/[slug].astro      # Gallery page
+	styles/global.css               # Tailwind and variables
+	types/                          # Shared types
+astro.config.ts                   # Vercel adapter, image optimization, Tailwind
 ```

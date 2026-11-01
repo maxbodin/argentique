@@ -1,0 +1,42 @@
+---
+import "@/styles/global.css";
+import poppinsUrl from "@fontsource/poppins/files/poppins-latin-300-normal.woff2?url";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = "argentique", description = "gallery of film photography" } = Astro.props;
+
+// woff2 only: an extra fallback source that never gets downloaded (fontsource lists a legacy .woff) makes Safari hold the first paint until every photo on the page has loaded.
+const fontFace = `@font-face{font-family:Poppins;font-style:normal;font-weight:300;font-display:swap;src:url(${ poppinsUrl }) format("woff2")}`;
+
+// No-JS replacement for client-side prefetching (Chromium): every gallery's HTML is fetched as soon as the page loads, and a hovered link is fully prerendered (photos included).
+const speculationRules = {
+  prefetch: [{ where: { href_matches: "/gallery/*" }, eagerness: "immediate" }],
+  prerender: [{ where: { href_matches: "/*" }, eagerness: "moderate" }],
+};
+---
+<html lang="en" class="h-full">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{ title }</title>
+  <meta name="description" content={ description } />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="preload" href={ poppinsUrl } as="font" type="font/woff2" crossorigin />
+  <style is:inline set:html={ fontFace } />
+  <slot name="head" />
+  <script type="speculationrules" is:inline set:html={ JSON.stringify( speculationRules ) } />
+</head>
+<body class="flex flex-col h-full">
+<div class="grow">
+  <slot />
+</div>
+<footer class="text-center py-20 text-gray-500 text-sm">
+  <p>&copy; { new Date().getFullYear() } argentique by Maxime Bodin.
+    <br /> All rights reserved.</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,20 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getGalleryFolders } from "@/lib/data";
+
+const galleryFolders = await getGalleryFolders();
+---
+<Layout>
+  <main class="container mx-auto mt-64 px-10 py-10">
+    { galleryFolders.map( ( gallery ) => (
+      <a
+        href={ `/gallery/${ gallery }` }
+        class="group relative block overflow-hidden mb-2"
+      >
+        <h1 class="text-2xl tracking-widest uppercase">
+          { gallery.replace( /-/g, " " ) }
+        </h1>
+      </a>
+    ) ) }
+  </main>
+</Layout>

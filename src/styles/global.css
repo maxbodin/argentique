@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@font-face {
+    font-family: "Poppins Fallback";
+    src: local(Arial);
+    ascent-override: 93.62%;
+    descent-override: 31.21%;
+    line-gap-override: 8.92%;
+    size-adjust: 112.16%;
+}
+
+:root {
+    --background: #ffffff;
+    --foreground: #171717;
+    --hover-foreground: #717171;
+}
+
+body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: Poppins, "Poppins Fallback";
+    font-style: normal;
+    font-weight: 300;
+}
+
+h1 {
+    @apply text-(--foreground) transition-colors duration-300;
+}
+
+h1:hover {
+    @apply text-(--hover-foreground);
+}
